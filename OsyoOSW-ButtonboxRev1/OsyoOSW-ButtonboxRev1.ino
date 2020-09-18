@@ -7,6 +7,10 @@
 #define PCNT_L_LIM_VAL -100 //not for use
 #define PULSE_INPUT_PIN_B 12 //2nd encoder;s pulse input pin
 #define PULSE_CTRL_PIN_B 13 //2nd encoder;s pulse ctrl pin
+#define PULSE_INPUT_PIN_C 18 //3rd encoder's pulse input pin 
+#define PULSE_CTRL_PIN_C 19 //3rd encoder's pulse ctrl pin
+#define PULSE_INPUT_PIN_D 23 //4th encoder's pulse input pin 
+#define PULSE_CTRL_PIN_D 26 //4th encoder's pulse ctrl pin
 
 
 BleGamepad bleGamepad;
@@ -14,6 +18,8 @@ byte pins[] ={18, 19, 23, 22, 25, 26, 32, 33}; // GPIO Pin number of Key matrix
 int buttonState[16]; //16 button state available but in this case it use only 12
 int16_t pcount_A = 0; //1st encoder pulse counter value
 int16_t pcount_B = 0; //2nd encoder pulse counter value
+int16_t pcount_C = 0; //3rd encoder pulse counter value
+int16_t pcount_D = 0; //4th encoder pulse counter value
 
 void setup() {
   bleGamepad.begin();
@@ -48,6 +54,32 @@ void setup() {
     pcnt_config_B.counter_h_lim = PCNT_H_LIM_VAL;
     pcnt_config_B.counter_l_lim = PCNT_L_LIM_VAL;
 
+    pcnt_config_t pcnt_config_C;  //Declaration of 3rd pulse counter configuration structures
+    pcnt_config_C.pulse_gpio_num = PULSE_INPUT_PIN_C;
+    pcnt_config_C.ctrl_gpio_num = PULSE_CTRL_PIN_C;
+    pcnt_config_C.lctrl_mode = PCNT_MODE_REVERSE;
+    pcnt_config_C.hctrl_mode = PCNT_MODE_KEEP;
+    pcnt_config_C.channel = PCNT_CHANNEL_2;
+    pcnt_config_C.unit = PCNT_UNIT_2;
+    pcnt_config_C.pos_mode = PCNT_COUNT_INC;
+    pcnt_config_C.neg_mode = PCNT_COUNT_DEC;
+    pcnt_config_C.counter_h_lim = PCNT_H_LIM_VAL;
+    pcnt_config_C.counter_l_lim = PCNT_L_LIM_VAL;
+
+
+    pcnt_config_t pcnt_config_D;  //Declaration of 4th pulse counter configuration structures
+    pcnt_config_D.pulse_gpio_num = PULSE_INPUT_PIN_D;
+    pcnt_config_D.ctrl_gpio_num = PULSE_CTRL_PIN_D;
+    pcnt_config_D.lctrl_mode = PCNT_MODE_REVERSE;
+    pcnt_config_D.hctrl_mode = PCNT_MODE_KEEP;
+    pcnt_config_D.channel = PCNT_CHANNEL_3;
+    pcnt_config_D.unit = PCNT_UNIT_3;
+    pcnt_config_D.pos_mode = PCNT_COUNT_INC;
+    pcnt_config_D.neg_mode = PCNT_COUNT_DEC;
+    pcnt_config_D.counter_h_lim = PCNT_H_LIM_VAL;
+    pcnt_config_D.counter_l_lim = PCNT_L_LIM_VAL;
+
+  
                   
     // Initialize pulse counter parameters
     pcnt_unit_config(&pcnt_config_A); 
@@ -56,8 +88,16 @@ void setup() {
     pcnt_counter_clear(PCNT_UNIT_0);
     pcnt_counter_pause(PCNT_UNIT_1);
     pcnt_counter_clear(PCNT_UNIT_1);
+    pcnt_counter_pause(PCNT_UNIT_2);
+    pcnt_counter_clear(PCNT_UNIT_2);
+    pcnt_counter_pause(PCNT_UNIT_3);
+    pcnt_counter_clear(PCNT_UNIT_3);
+ 
+    
     pcnt_counter_resume(PCNT_UNIT_0);
     pcnt_counter_resume(PCNT_UNIT_1);
+    pcnt_counter_resume(PCNT_UNIT_2);
+    pcnt_counter_resume(PCNT_UNIT_3);
 
  
 }
@@ -200,8 +240,6 @@ void loop() {
             
 
         pcnt_get_counter_value(PCNT_UNIT_1, &pcount_B);
-//Debug        if(pcount_B > 1000) pcnt_counter_clear(PCNT_UNIT_0);
-//Debug        if(pcount_B < -1000) pcnt_counter_clear(PCNT_UNIT_0);
         if(pcount_B < 0){
           bleGamepad.press(BUTTON_19);
           delay(50);
@@ -213,6 +251,37 @@ void loop() {
           delay(50);
           bleGamepad.release(BUTTON_20);
           pcnt_counter_clear(PCNT_UNIT_1);
+          }
+
+
+
+        pcnt_get_counter_value(PCNT_UNIT_2, &pcount_C);
+        if(pcount_C < 0){
+          bleGamepad.press(BUTTON_21);
+          delay(50);
+          bleGamepad.release(BUTTON_21);
+          pcnt_counter_clear(PCNT_UNIT_2);
+          }
+        if(pcount_C > 0){
+          bleGamepad.press(BUTTON_22);
+          delay(50);
+          bleGamepad.release(BUTTON_22);
+          pcnt_counter_clear(PCNT_UNIT_2);
+          }
+
+
+        pcnt_get_counter_value(PCNT_UNIT_3, &pcount_D);
+        if(pcount_D < 0){
+          bleGamepad.press(BUTTON_23);
+          delay(50);
+          bleGamepad.release(BUTTON_23);
+          pcnt_counter_clear(PCNT_UNIT_3);
+          }
+        if(pcount_D > 0){
+          bleGamepad.press(BUTTON_24);
+          delay(50);
+          bleGamepad.release(BUTTON_24);
+          pcnt_counter_clear(PCNT_UNIT_3);
           }
 
 
